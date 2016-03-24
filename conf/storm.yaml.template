@@ -1,19 +1,13 @@
-storm.zookeeper.servers:
-    - "%zookeeper%"
-
-nimbus.host: "%nimbus%"
-
-ui.port: %ui_port%
-
 # netty transport
 storm.messaging.transport: "backtype.storm.messaging.netty.Context"
 storm.messaging.netty.buffer_size: 16384
 storm.messaging.netty.max_retries: 10
 storm.messaging.netty.min_wait_ms: 1000
 storm.messaging.netty.max_wait_ms: 5000
-
-drpc.servers:
-  - "%nimbus%"
-drpc.port: 3772
-drpc.invocations.port: 3773
-
+storm.local.dir: /opt/apache-storm/storm_local
+nimbus.childopts: "-Xmx128m"
+ui.childopts: "-Xmx128m"
+drpc.childopts: "-Xmx128m"
+supervisor.childopts: "-Xmx128m"
+worker.childopts: "-Xmx128m -Djava.util.logging.config.file=/opt/apache-storm/conf/logging.properties"
+topology.sleep.spout.wait.strategy.time.ms: 50

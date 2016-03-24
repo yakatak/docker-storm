@@ -1,10 +1,10 @@
-# apache-storm-0.10.0
+# apache-storm-0.9.3
 #
 # VERSION      1.0
 
 # use the ubuntu base image provided by dotCloud
-FROM ubuntu:15.10
-MAINTAINER Florian HUSSONNOIS, florian.hussonnois_gmail.com
+FROM ubuntu:14.04
+MAINTAINER Xabier Eizmendi, xabier_yakatak.com
 
 RUN apt-get update
 RUN apt-get upgrade -y
@@ -20,33 +20,30 @@ RUN apt-get install -y oracle-java8-installer
 RUN apt-get update
 
 # Tells Supervisor to run interactively rather than daemonize
-RUN apt-get install -y supervisor wget tar 
-RUN echo [supervisord] | tee -a /etc/supervisor/supervisord.conf ; echo nodaemon=true | tee -a /etc/supervisor/supervisord.conf
+RUN apt-get install -y wget tar 
 
-ENV STORM_VERSION 0.10.0
+ENV STORM_VERSION 0.9.3
 
-# Create storm group and user
-ENV STORM_HOME /usr/share/apache-storm
-
-RUN groupadd storm; useradd --gid storm --home-dir /home/storm --create-home --shell /bin/bash storm
+ENV STORM_HOME /opt/apache-storm
 
 # Download and Install Apache Storm
 RUN wget http://apache.mirrors.ovh.net/ftp.apache.org/dist/storm/apache-storm-$STORM_VERSION/apache-storm-$STORM_VERSION.tar.gz && \
-tar -xzvf apache-storm-$STORM_VERSION.tar.gz -C /usr/share && mv $STORM_HOME-$STORM_VERSION $STORM_HOME && \
+tar -xzvf apache-storm-$STORM_VERSION.tar.gz -C /opt && mv $STORM_HOME-$STORM_VERSION $STORM_HOME && \
 rm -rf apache-storm-$STORM_VERSION.tar.gz
 
-RUN mkdir /var/log/storm ; chown -R storm:storm /var/log/storm ; ln -s /var/log/storm /home/storm/log
-RUN ln -s $STORM_HOME/bin/storm /usr/bin/storm
+RUN mkdir -p $STORM_HOME/storm_local
+ADD conf/cluster.xml $STORM_HOME/logback/cluster.xml
 ADD conf/storm.yaml.template $STORM_HOME/conf/storm.yaml.template
+ADD conf/logging.properties $STORM_HOME/conf/logging.properties
 
-# Add scripts required to run storm daemons under supervision
-ADD script/entrypoint.sh /home/storm/entrypoint.sh
-ADD supervisor/storm-daemon.conf /home/storm/storm-daemon.conf
+ADD script/entrypoint.sh $STORM_HOME/bin/entrypoint.sh
 
-RUN chown -R storm:storm $STORM_HOME && chmod u+x /home/storm/entrypoint.sh
+RUN chmod u+x $STORM_HOME/bin/entrypoint.sh
 
-# Add VOLUMEs to allow backup of config and logs
-VOLUME ["/usr/share/apache-storm/conf","/var/log/storm"]
+EXPOSE 3772 3773 6627 6700 6701 6702 6703 6704 6705 6706 6707 6708 6709 6710 6711 6712 6713 6714 6715
 
-ENTRYPOINT ["/bin/bash", "/home/storm/entrypoint.sh"]
+WORKDIR /opt/apache-storm
 
+VOLUME /opt/apache-storm/storm_local
+
+ENTRYPOINT ["/bin/bash", "/opt/apache-storm/bin/entrypoint.sh"]
