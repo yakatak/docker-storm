@@ -13,7 +13,7 @@ fi
 
 # Set nimbus address to local ip by default
 if [ -z "$CONFIG_NIMBUS_HOST" ]; then
-  export CONFIG_NIMBUS_HOST=$(hostname -I)
+  export CONFIG_NIMBUS_HOST="\"$(hostname -I)\""
 fi
 
 # Set zookeeper address to zookeeper by default
@@ -42,6 +42,7 @@ function init_storm_yaml() {
 }
 
 init_storm_yaml
+cat $STORM_HOME/conf/storm.yaml
 
 bin/storm $@
 
