@@ -25,9 +25,9 @@ function init_storm_yaml() {
     STORM_YAML=$STORM_HOME/conf/storm.yaml
     cp $STORM_HOME/conf/storm.yaml.template $STORM_YAML
 
-    for var in `( set -o posix ; set ) | grep CONFIG_`; do
-        name=${var%"="*}
-        confValue=${var#*"="}
+    for var in $(compgen -v | grep CONFIG_); do
+        name=$var
+        confValue=${!var}
         confName=`echo ${name#*CONFIG_} | awk '{print tolower($0)}'`
         confName=`echo $confName | sed -r 's/_/./g'`
         n=`echo $(grep -n "^${confName}:" "${STORM_YAML}" | cut -d : -f 1)`
@@ -42,7 +42,6 @@ function init_storm_yaml() {
 }
 
 init_storm_yaml
-cat $STORM_HOME/conf/storm.yaml
 
 bin/storm $@
 
