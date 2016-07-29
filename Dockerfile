@@ -46,4 +46,6 @@ WORKDIR /opt/apache-storm
 
 VOLUME /opt/apache-storm/storm_local
 
+VOLUME /var/log/storm
+
 ENTRYPOINT ["/bin/bash", "/opt/apache-storm/bin/entrypoint.sh"]
